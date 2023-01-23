@@ -1,64 +1,39 @@
-name: MSDO ubuntu-latest
+name: MSDO IaC Scan
+
 on:
+  # Triggers the workflow on push or pull request events but only for the main branch
   push:
     branches: [ main ]
+    
   pull_request:
     branches: [ main ]
+
   workflow_dispatch:
 
 jobs:
+  security:
+    runs-on: windows-latest
+    continue-on-error: false
+    strategy:
+      fail-fast: true
+      
+    steps:
+    - uses: actions/checkout@v2
+    
+    - uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: |
+          5.0.x
+          6.0.x
+          
+    - name: Run Microsoft Security DevOps
+      uses: microsoft/security-devops-action@preview
+      continue-on-error: false
+      id: msdo
+      with:
+        categories: 'IaC'
 
-    deploy:
-      runs-on: ubuntu-latest
-      steps:
-
-      - name: Login to Azure
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-      - name: Checkout source code
-        uses: actions/checkout@v2
-
- #     - name: Triggers the workflow on push or pull request events, for the main branch
- #       pull_request:
- #         branches: ["main"]
-
- #     - name: Set up Python
- #       uses: actions/setup-python@v2
- #       with:
- #       python-version: 3.9
-
- #     - name: Install dependencies
- #       run: |
- #         python -m pip install --upgrade pip
- #         pip install Flask
- #         pip install Werkzeug
-
-      - name: Install Security OSS tool dependencies
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: |
-            5.0.x
-            6.0.x
-
-        # Run analyzers
-      - name: Run Microsoft Security DevOps Analysis
-        uses: microsoft/security-devops-action@preview
-        id: msdo
-
-      # Upload alerts to the Security tab
-      - name: Upload alerts to Security tab
-        uses: github/codeql-action/upload-sarif@v1
-        with:
-          sarif_file: ${{ steps.msdo.outputs.sarifFile }}
-
-      - name: Deploy ARM Template
-        uses: azure/CLI@v1
-        with:
-          inlineScript: |
-            az deployment group create \
-            --name StorageAccountDeployment \
-            --resource-group lat-dfd \
-            --template-file armtemplates/storageaccount.json \
-            --parameters storageAccountType=Standard_GRS
+    - name: Upload alerts to Security tab
+      uses: github/codeql-action/upload-sarif@v2
+      with:
+        sarif_file: ${{ steps.msdo.outputs.sarifFile }}

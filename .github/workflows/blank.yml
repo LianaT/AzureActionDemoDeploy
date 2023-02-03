@@ -33,10 +33,10 @@ jobs:
       with:
         categories: 'IaC'
 
-    - name: Upload alerts to Security tab
-      uses: github/codeql-action/upload-sarif@v2
-      with:
-        sarif_file: ${{ steps.msdo.outputs.sarifFile }}
+   # - name: Upload alerts to Security tab
+   #   uses: github/codeql-action/upload-sarif@v2
+   #   with:
+   #     sarif_file: ${{ steps.msdo.outputs.sarifFile }}
 
     - name: Upload alerts file as a workflow artifact
       uses: actions/upload-artifact@v3

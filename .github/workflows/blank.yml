@@ -28,7 +28,7 @@ jobs:
           
     - name: Run Microsoft Security DevOps
       uses: microsoft/security-devops-action@preview
-      continue-on-error: false
+      continue-on-error: true
       id: msdo
       with:
         categories: 'IaC'

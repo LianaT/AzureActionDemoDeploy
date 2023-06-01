@@ -30,8 +30,6 @@ jobs:
       uses: microsoft/security-devops-action@preview
       continue-on-error: true
       id: msdo
-      with:
-        tools: 'AntiMalware'
 
    # - name: Upload alerts to Security tab
    #   uses: github/codeql-action/upload-sarif@v2
